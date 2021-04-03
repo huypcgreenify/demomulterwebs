@@ -12,12 +12,25 @@ var storage = multer.diskStorage({
   }
 })
 
-var upload = multer({ storage: storage })
-router.post('/profile', upload.single('avatar'), function (req, res, next) {
-  // req.file is the `avatar` file
+var upload = multer({
+  dest: 'public/uploads'
+  , storage: storage,
+  limits: {
+    fileSize: 1 * 1024 * 1024, // gioi han file size <= 1MB
+  }
+}).single('avatar')
+
+router.post('/profile', function (req, res) {
+  // req.file is the name of your file in the form above, here 'uploaded_file'
   // req.body will hold the text fields, if there were any
-  res.send("OK, check file nhe!!");
-})
+  upload(req, res, function (error) {
+    if (error instanceof multer.MulterError) {
+      return res.send("File size Maximum is 1MB.Please try again!!!")
+    } else {
+      return res.send('OK nhe');
+    }
+  });
+});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
